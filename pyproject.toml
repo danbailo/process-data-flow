@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "process_data_flow"
 version = "0.1.0"
-description = "This project implements a basic example of a process data flow. In this case, the handle of some data end to end, from the receive until the "register" of this data."
+description = "This project implements a basic example of a process data flow. In this case, the handle of some data end to end, from the receive until the 'register' of this data."
 authors = ["Daniel Bailo <danbailoufms@gmail.com>"]
 readme = "README.md"
 
