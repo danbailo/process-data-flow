@@ -9,6 +9,7 @@ class ItemSchema(BaseModel):
     observation: str | None
 
     @field_serializer('price')
+    @staticmethod
     def format_value(value: float) -> float:
         return round(value, 2)
 
