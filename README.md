@@ -1,6 +1,6 @@
 # Process Data Flow - An example of flow that receive/process/register some data.
 
-[![Tests](https://github.com/danbailo/process-data-flow/actions/workflows/tests.yaml/badge.svg?branch=main)](https://github.com/danbailo/process-data-flow/actions/workflows/tests.yaml) ![Coverage Status](./assets/coverage-badge.svg)
+[![Tests and Linting](https://github.com/danbailo/process-data-flow/actions/workflows/tests.yaml/badge.svg?branch=main)](https://github.com/danbailo/process-data-flow/actions/workflows/tests.yaml) ![Coverage Status](./assets/coverage-badge.svg)
 
 Simple structure that I([@danbailo](https://github.com/danbailo)) like use to build projects.
 
