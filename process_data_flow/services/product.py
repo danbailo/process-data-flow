@@ -7,10 +7,9 @@ from process_data_flow.repositories.product import ProductRepository
 class SendProductsToRabbitService:
     def __init__(
         self,
-        product_repository: ProductRepository,
         logger: Logger = LoggerFactory.new(),
     ):
-        self.product_repository = product_repository
+        self.product_repository = ProductRepository()
         self.logger = logger
 
     def execute(self):
