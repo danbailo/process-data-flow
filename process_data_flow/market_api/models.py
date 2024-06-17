@@ -5,7 +5,7 @@ from sqlmodel import Field, SQLModel
 class ProductModel(SQLModel, table=True):
     __tablename__ = 'product'
 
-    id: UUID4 = Field(primary_key=True)
+    id: UUID4 = Field(primary_key=True, index=True)
     name: str
-    price: float = Field(gt=0, lt=1000)
-    observation: str | None = Field(min_length=80)
+    price: float
+    observation: str | None
