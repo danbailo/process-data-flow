@@ -4,6 +4,8 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+DATABASE_URL = os.getenv('DATABASE_URL', 'sqlite:///database.db')
+
 CALLBACK_API_URL = os.getenv('CALLBACK_API_URL', 'http://localhost:8081')
 
 RABBITMQ_HOST = os.getenv('RABBIT_HOST', 'localhost')
