@@ -1,13 +1,13 @@
 from fastapi import FastAPI
 
-from process_data_flow.callback_api.utils import generate_random_data
+from process_data_flow.utils import random_generate_fake_products
 
 app = FastAPI()
 
 
 @app.get('/products')
 async def check_if_have_products():
-    products_to_return = generate_random_data()
+    products_to_return = random_generate_fake_products()
     return {'size': len(products_to_return), 'products': products_to_return}
 
 

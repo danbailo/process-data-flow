@@ -1,4 +1,3 @@
-
 import pika
 from tenacity import retry, retry_if_not_exception_type, stop_after_attempt, wait_fixed
 
