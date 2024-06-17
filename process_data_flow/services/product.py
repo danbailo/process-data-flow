@@ -44,8 +44,10 @@ class SendProductsToRabbitService:
         for product in products:
             self.logger.info(
                 'Product sent to RabbitMQ',
-                product=product,
-                exchange=PRODUCT_CONSUMER_EXCHANGE,
+                data=dict(
+                    product=product,
+                    exchange=PRODUCT_CONSUMER_EXCHANGE,
+                ),
             )
             self.rabbitmq.send_message(
                 body=json.dumps(product),
@@ -61,4 +63,6 @@ class SendProductsToRabbitService:
         self.logger.debug(f'Was returned {len(products)} products')
         self._send_products_to_rabbitmq(products)
 
-        self.logger.info('Products sent with successfully!', products_sent=len(products))
+        self.logger.info(
+            'Products sent with successfully!', data=dict(len_products=len(products))
+        )
