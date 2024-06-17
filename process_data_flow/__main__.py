@@ -1,27 +1,25 @@
-import typer
+import uvicorn
+from typer import Option, Typer
 
-from process_data_flow.commons.decorators import coro
 from process_data_flow.commons.logger import Logger, LoggerFactory
 
 logger: Logger = LoggerFactory.new()
 
-app = typer.Typer()
-
-
-@app.callback()
-def callback():
-    pass
+app = Typer()
 
 
 @app.command()
-@coro
-def async_execute(option: str = typer.Option()):
-    logger.info(f'option: {option}')
+def callback_api(
+    port: int = Option(default=8081), reload: bool = Option(default=False, is_flag=True)
+):
+    uvicorn.run('process_data_flow.callback_api.app:app', port=port, reload=reload)
 
 
 @app.command()
-def execute(option: str = typer.Option()):
-    logger.info(f'option: {option}')
+def market_api(
+    port: int = Option(default=8082), reload: bool = Option(default=False, is_flag=True)
+):
+    uvicorn.run('process_data_flow.market_api.app:app', port=port, reload=reload)
 
 
 if __name__ == '__main__':
