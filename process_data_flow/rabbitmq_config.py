@@ -25,7 +25,7 @@ class RabbitMQConfig:
         self.client = RabbitMQClient()
         self.logger = logger
 
-        self.logger.info('Configuring RabbitMQ...')
+        self.logger.debug('Configuring RabbitMQ...')
         self._configure_product_consumer()
         self._configure_market_query()
         self._configure_register_product()
