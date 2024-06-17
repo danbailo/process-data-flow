@@ -1,6 +1,8 @@
+
 import pika
 from tenacity import retry, retry_if_not_exception_type, stop_after_attempt, wait_fixed
 
+from process_data_flow.commons.logger import Logger, LoggerFactory
 from process_data_flow.settings import (
     RABBITMQ_HOST,
     RETRY_AFTER_SECONDS,
@@ -14,13 +16,10 @@ class NotRouteException(Exception):
 
 
 class RabbitMQClient:
-    def __init__(self, host: str = RABBITMQ_HOST):
+    def __init__(self, host: str = RABBITMQ_HOST, logger: Logger = LoggerFactory.new()):
         self.connection = pika.BlockingConnection(pika.ConnectionParameters(host))
         self.channel = self.connection.channel()
-        self.channel.basic_qos(prefetch_count=1)
-
-    def __del__(self):
-        self.connection.close()
+        self.logger = logger
 
     @retry(
         reraise=True,
