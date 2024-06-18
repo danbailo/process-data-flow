@@ -2,7 +2,7 @@ from fastapi import APIRouter
 
 from process_data_flow.utils import random_generate_fake_products
 
-route = APIRouter()
+route = APIRouter(prefix='/product', tags=['product'])
 
 
 @route.get('')

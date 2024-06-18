@@ -13,6 +13,6 @@ def warning_if_failed(retry_state: RetryCallState):
     if retry_state.attempt_number > 1:
         _logger.warning(
             'Trying again...',
-            tentativa=retry_state.attempt_number,
-            metodo=retry_state.fn.__qualname__,
+            attempt=retry_state.attempt_number,
+            method=retry_state.fn.__qualname__,
         )

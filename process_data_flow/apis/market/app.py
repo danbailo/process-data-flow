@@ -17,9 +17,9 @@ async def lifespan(app: FastAPI):
     _logger.debug(f'Shutdown API - {app.title}')
 
 
-app = FastAPI(lifespan=lifespan)
+app = FastAPI(title='Market API', lifespan=lifespan)
 
-app.include_router(product.router, prefix='/product', tags=['product'])
+app.include_router(product.router)
 
 
 @app.get('/health')

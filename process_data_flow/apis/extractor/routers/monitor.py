@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 
-route = APIRouter()
+route = APIRouter(prefix='/monitor', tags=['monitor'])
 
 
 @route.get('/products')
