@@ -1,5 +1,5 @@
 import pika
-from tenacity import retry, retry_if_not_exception_type, stop_after_attempt, wait_fixed
+from tenacity import retry, stop_after_attempt, wait_fixed
 
 from process_data_flow.commons.logger import Logger, LoggerFactory
 from process_data_flow.settings import (
@@ -24,7 +24,6 @@ class RabbitMQClient:
         reraise=True,
         stop=stop_after_attempt(RETRY_ATTEMPTS),
         wait=wait_fixed(RETRY_AFTER_SECONDS),
-        retry=retry_if_not_exception_type(),
     )
     def send_message(
         self, body: str, exchange: str = '', routing_key: str = '', **kwargs

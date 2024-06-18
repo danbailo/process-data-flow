@@ -1,4 +1,3 @@
-
 from pika.channel import Channel
 from pika.spec import Basic, BasicProperties
 
