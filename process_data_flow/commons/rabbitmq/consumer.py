@@ -14,6 +14,7 @@ class RabbitMQConsumerOptions(BaseModel):
     exclusive: bool = False
     # consumer_tag=None
     arguments: dict = None
+    requeue: bool = True
 
 
 class RabbitMQConsumer(ABC):
@@ -44,20 +45,26 @@ class RabbitMQConsumer(ABC):
         body: bytes,
     ):
         self.logger = self.logger.new(
-            monitoring=dict(queue=self.options.queue, body=body.decode())
+            monitoring=dict(queue=self.options.queue, message=body.decode())
         )
+        self.logger.info('Consuming message')
         try:
             self._execute(ch, method, properties, body)
             ch.basic_ack(delivery_tag=method.delivery_tag)
             self.logger.info('Message consumed with sucessfully!')
 
         except Exception:
-            ch.basic_nack(delivery_tag=method.delivery_tag)
+            ch.basic_nack(delivery_tag=method.delivery_tag, requeue=self.options.requeue)
             self.logger.exception('An error has occured when consuming message!')
 
     def consume(self):
-        self.logger.info('Consuming queue', monitoring=dict(queue=self.options.queue))
+        self.logger.info('Starting consumer...', monitoring=self.options.model_dump())
 
-        options = self.options.model_dump(exclude_none=True)
-        self.client.channel.basic_consume(**options, on_message_callback=self._callback)
+        self.client.channel.basic_consume(
+            queue=self.options.queue,
+            auto_ack=self.options.auto_ack,
+            exclusive=self.options.exclusive,
+            arguments=self.options.arguments,
+            on_message_callback=self._callback
+        )
         self.client.channel.start_consuming()
