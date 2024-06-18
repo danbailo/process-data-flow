@@ -14,7 +14,7 @@ RABBITMQ_HOST = os.getenv('RABBIT_HOST', 'localhost')
 RETRY_ATTEMPTS = 7
 RETRY_AFTER_SECONDS = 3
 
-MESSAGE_TTL = 30000
+MESSAGE_TTL = 300000
 
 PRODUCT_CONSUMER_EXCHANGE = 'product_consumer.exchange'
 PRODUCT_CONSUMER_QUEUE = 'product_consumer.queue'
