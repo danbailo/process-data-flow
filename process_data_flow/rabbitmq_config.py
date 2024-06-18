@@ -87,8 +87,8 @@ class RabbitMQConfig:
             arguments={
                 'x-dead-letter-exchange': REGISTER_PRODUCT_DLX,
                 'x-dead-letter-routing-key': REGISTER_PRODUCT_DL_KEY,
-            },            
-            durable=True
+            },
+            durable=True,
         )
         self.client.channel.queue_bind(
             exchange=REGISTER_PRODUCT_EXCHANGE,

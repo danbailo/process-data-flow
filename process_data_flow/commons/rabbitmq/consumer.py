@@ -54,7 +54,9 @@ class RabbitMQConsumer(ABC):
             self.logger.info('Message consumed with sucessfully!')
 
         except Exception:
-            ch.basic_nack(delivery_tag=method.delivery_tag, requeue=self.options.requeue)
+            ch.basic_nack(
+                delivery_tag=method.delivery_tag, requeue=self.options.requeue
+            )
             self.logger.exception('An error has occured when consuming message!')
 
     def consume(self):
@@ -65,6 +67,6 @@ class RabbitMQConsumer(ABC):
             auto_ack=self.options.auto_ack,
             exclusive=self.options.exclusive,
             arguments=self.options.arguments,
-            on_message_callback=self._callback
+            on_message_callback=self._callback,
         )
         self.client.channel.start_consuming()
