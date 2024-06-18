@@ -1,13 +1,13 @@
 import random
 
-from process_data_flow.schemas import ProductFactory, ProductOut
+from process_data_flow.schemas import ProductBody, ProductFactory
 
 
-def generate_fake_products(size: int = 1) -> list[ProductOut]:
+def generate_fake_products(size: int = 1) -> list[ProductBody]:
     return ProductFactory.batch(size)
 
 
-def random_generate_fake_products() -> list[ProductOut]:
+def random_generate_fake_products() -> list[ProductBody]:
     should_return_value = random.choice([True, False])
     if not should_return_value:
         return []

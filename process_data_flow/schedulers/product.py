@@ -7,7 +7,7 @@ import schedule
 from tenacity import retry, stop_after_attempt, wait_fixed
 
 from process_data_flow.commons.logger import Logger, LoggerFactory
-from process_data_flow.commons.rabbitmq_client import RabbitMQClient
+from process_data_flow.commons.rabbitmq.client import RabbitMQClient
 from process_data_flow.commons.tenacity import warning_if_failed
 from process_data_flow.settings import (
     CALLBACK_API_URL,

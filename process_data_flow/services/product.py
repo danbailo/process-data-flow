@@ -1,7 +1,7 @@
 import json
 
 from process_data_flow.commons.logger import Logger, LoggerFactory
-from process_data_flow.schemas import ProductOut
+from process_data_flow.schemas import ProductBody
 
 
 class FormatProductService:
@@ -16,11 +16,11 @@ class FormatProductService:
         )
         return product
 
-    def _load_product_from_rabbitmq(self, product_from_queue: bytes) -> ProductOut:
+    def _load_product_from_rabbitmq(self, product_from_queue: bytes) -> ProductBody:
         product_dict = json.loads(product_from_queue.decode())
-        return ProductOut(**product_dict)
+        return ProductBody(**product_dict)
 
-    def execute(self, product_from_queue: bytes) -> ProductOut:
+    def execute(self, product_from_queue: bytes) -> ProductBody:
         self.logger.info('Executing Format Product Service...')
 
         product = self._load_product_from_rabbitmq(product_from_queue)
@@ -28,4 +28,4 @@ class FormatProductService:
 
         to_return = self._format_product(product.model_dump(exclude={'id'}))
         self.logger.info('Product formatted!', data=dict(product_id=product_id))
-        return ProductOut(id=product_id, **to_return)
+        return ProductBody(id=product_id, **to_return)

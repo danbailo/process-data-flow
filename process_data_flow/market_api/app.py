@@ -1,5 +1,4 @@
 from contextlib import asynccontextmanager
-from uuid import uuid4
 
 import uvicorn
 from fastapi import Depends, FastAPI, HTTPException, Query, status
@@ -10,7 +9,7 @@ from process_data_flow.commons.api import BuildListResponse
 from process_data_flow.commons.logger import Logger, LoggerFactory
 from process_data_flow.market_api.database import get_session, init_db
 from process_data_flow.market_api.models import ProductModel
-from process_data_flow.schemas import ProductIn, ProductOut
+from process_data_flow.schemas import ProductBody
 
 _logger: Logger = LoggerFactory.new()
 
@@ -26,9 +25,14 @@ async def lifespan(app: FastAPI):
 app = FastAPI(lifespan=lifespan)
 
 
-@app.get('/product/{id}', response_model=ProductModel)
+@app.get('/product/{id}')
 async def get_product(id: UUID4, session: Session = Depends(get_session)):
-    product = session.exec(select(ProductModel).where(ProductModel.id == id)).one()
+    product = session.exec(select(ProductModel).where(ProductModel.id == id)).first()
+    if product is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f'Product with ID {id} does not exists!',
+        )
     return product
 
 
@@ -47,18 +51,17 @@ async def get_products(
     return to_return
 
 
-@app.post('/product', response_model=ProductOut, status_code=status.HTTP_201_CREATED)
-async def create_product(product: ProductIn, session: Session = Depends(get_session)):
-    product_id = uuid4()
+@app.post('/product', response_model=ProductBody, status_code=status.HTTP_201_CREATED)
+async def create_product(product: ProductBody, session: Session = Depends(get_session)):
     product_from_db = session.exec(
-        select(ProductModel).where(ProductModel.id == product_id)
+        select(ProductModel).where(ProductModel.id == product.id)
     ).first()
     if product_from_db:
         raise HTTPException(
             status=status.HTTP_409_CONFLICT,
             detail=f'Item with ID {product_from_db.id} already exists!',
         )
-    new_product = ProductModel(id=product_id, **product.model_dump())
+    new_product = ProductModel(**product.model_dump())
     session.add(new_product)
     session.commit()
     return new_product

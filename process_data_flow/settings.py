@@ -7,6 +7,7 @@ load_dotenv()
 DATABASE_URL = os.getenv('DATABASE_URL', 'sqlite:///database.db')
 
 CALLBACK_API_URL = os.getenv('CALLBACK_API_URL', 'http://localhost:8081')
+MARKET_API_URL = os.getenv('MARKET_API_URL', 'http://localhost:8082')
 
 RABBITMQ_HOST = os.getenv('RABBIT_HOST', 'localhost')
 
