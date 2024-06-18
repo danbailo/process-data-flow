@@ -1,13 +1,14 @@
 from math import ceil
 
 from pydantic import BaseModel, model_serializer
+from sqlmodel import SQLModel
 
 
 class BuildListResponse(BaseModel):
-    page: int
+    current_page: int
     limit: int
     total_items: int
-    items: list[BaseModel]
+    items: list[SQLModel]
 
     @model_serializer
     def serialize_model(self):
@@ -15,6 +16,6 @@ class BuildListResponse(BaseModel):
             'total_items': self.total_items,
             'total_pages': ceil(self.total_items / self.limit),
             'items_per_page': self.limit,
-            'current_page': self.page,
+            'current_page': self.current_page,
             'items': self.items,
         }
