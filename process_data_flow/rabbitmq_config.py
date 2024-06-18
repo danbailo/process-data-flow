@@ -1,5 +1,5 @@
 from process_data_flow.commons.logger import Logger, LoggerFactory
-from process_data_flow.commons.rabbitmq_client import RabbitMQClient
+from process_data_flow.commons.rabbitmq.client import RabbitMQClient
 from process_data_flow.settings import (
     MARKET_QUERY_DL_KEY,
     MARKET_QUERY_DLQ,
@@ -46,7 +46,14 @@ class RabbitMQConfig:
         self.client.channel.exchange_declare(
             exchange=MARKET_QUERY_EXCHANGE, exchange_type='direct'
         )
-        self.client.channel.queue_declare(queue=MARKET_QUERY_QUEUE, durable=True)
+        self.client.channel.queue_declare(
+            queue=MARKET_QUERY_QUEUE,
+            arguments={
+                'x-dead-letter-exchange': MARKET_QUERY_DLX,
+                'x-dead-letter-routing-key': MARKET_QUERY_DL_KEY,
+            },
+            durable=True,
+        )
         self.client.channel.queue_bind(
             exchange=MARKET_QUERY_EXCHANGE,
             queue=MARKET_QUERY_QUEUE,
@@ -75,7 +82,14 @@ class RabbitMQConfig:
         self.client.channel.exchange_declare(
             exchange=REGISTER_PRODUCT_EXCHANGE, exchange_type='direct'
         )
-        self.client.channel.queue_declare(queue=REGISTER_PRODUCT_QUEUE, durable=True)
+        self.client.channel.queue_declare(
+            queue=REGISTER_PRODUCT_QUEUE,
+            arguments={
+                'x-dead-letter-exchange': REGISTER_PRODUCT_DLX,
+                'x-dead-letter-routing-key': REGISTER_PRODUCT_DL_KEY,
+            },            
+            durable=True
+        )
         self.client.channel.queue_bind(
             exchange=REGISTER_PRODUCT_EXCHANGE,
             queue=REGISTER_PRODUCT_QUEUE,
