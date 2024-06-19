@@ -12,24 +12,6 @@ concurrency:
 
 jobs:
 
-  redis-container:
-    runs-on: ubuntu-latest
-    timeout-minutes: 20
-  
-    steps:
-    - name: Start container
-      run: |
-        docker run -d --name redis-stack -p 6379:6379 -p 8001:8001 redis/redis-stack:latest
-
-  rabbitmq-container:
-    runs-on: ubuntu-latest
-    timeout-minutes: 20
-  
-    steps:
-    - name: Start container
-      run: |
-        docker run -d --hostname my-rabbit --name rabbitmq -p 15672:15672 -p 5672:5672 rabbitmq:3.13.0-management 
-
   python:
     runs-on: ubuntu-latest
     timeout-minutes: 20
@@ -63,6 +45,9 @@ jobs:
 
     - name: Run types check
       run: make check_types
+
+    - name: Start containers
+      run: docker compose up -d
 
     - name: Run tests
       run: make test
