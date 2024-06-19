@@ -1,15 +1,14 @@
-
 import httpx
 from lxml import html
 from tenacity import retry, stop_after_attempt, wait_fixed
 
+from process_data_flow.commons.decorators import async_cache
 from process_data_flow.commons.tenacity import warning_if_failed
 from process_data_flow.scrapers.base import BaseScraper
 from process_data_flow.settings import RETRY_AFTER_SECONDS, RETRY_ATTEMPTS
 
 
 class MagaluScraper(BaseScraper):
-
     @property
     def base_url(self):
         return 'https://www.magazineluiza.com.br/'
@@ -60,8 +59,11 @@ class MagaluScraper(BaseScraper):
         self.logger.info('Data extracted!')
         return to_return
 
+    @async_cache(ttl=300, is_class_method=True)
     async def get_products_from_first_page(self, product: str):
-        self.logger.info('Getting products from first page...', data=dict(product=product))
+        self.logger.info(
+            'Getting products from first page...', data=dict(product=product)
+        )
 
         response = await self._request_product(product)
         xpath = '//div[@data-testid="product-list"]//li'

@@ -1,10 +1,21 @@
 import os
 
+import redis
 from dotenv import load_dotenv
 
 load_dotenv()
 
 DATABASE_URL = os.getenv('DATABASE_URL', 'sqlite:///database.db')
+
+REDIS_CONFIG = {
+    'host': os.getenv('REDIS_HOST') or 'localhost',
+    'port': os.getenv('REDIS_PORT') or 6379,
+    'db': os.getenv('REDIS_DB') or 0,
+    'decode_responses': os.getenv('REDIS_DECODE_RESPONSES') or True,
+}
+
+REDIS_CLIENT = redis.Redis(**REDIS_CONFIG)
+
 
 CALLBACK_API_URL = os.getenv('CALLBACK_API_URL', 'http://localhost:8081')
 MARKET_API_URL = os.getenv('MARKET_API_URL', 'http://localhost:8082')
