@@ -23,6 +23,6 @@ async def health():
     return {'detail': 'ok'}
 
 
-app.include_router(extract_data.route)
-app.include_router(monitor.route)
-app.include_router(product.route)
+app.include_router(extract_data.router)
+app.include_router(monitor.router)
+app.include_router(product.router)

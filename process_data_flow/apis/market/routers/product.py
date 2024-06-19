@@ -43,7 +43,7 @@ async def create_product(product: ProductBody, session: Session = Depends(get_se
     ).first()
     if product_from_db:
         raise HTTPException(
-            status=status.HTTP_409_CONFLICT,
+            status_code=status.HTTP_409_CONFLICT,
             detail=f'Item with ID {product_from_db.id} already exists!',
         )
     new_product = ProductModel(**product.model_dump())

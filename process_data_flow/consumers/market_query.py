@@ -22,7 +22,7 @@ class MarketQueryConsumer(RabbitMQConsumer):
         properties: BasicProperties,
         body: bytes,
     ):
-        breakpoint()
+        # breakpoint()
         raise Exception('foo')
 
         # self.client.send_message(
