@@ -16,7 +16,9 @@ class NotRouteException(Exception):
 
 class RabbitMQClient:
     def __init__(self, host: str = RABBITMQ_HOST, logger: Logger = LoggerFactory.new()):
-        self.connection = pika.BlockingConnection(pika.ConnectionParameters(host))
+        self.connection = pika.BlockingConnection(
+            pika.ConnectionParameters(host, connection_attempts=12, retry_delay=5)
+        )
         self.channel = self.connection.channel()
         self.logger = logger
 
