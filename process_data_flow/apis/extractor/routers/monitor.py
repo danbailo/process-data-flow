@@ -53,6 +53,20 @@ async def monitor_new_product(
     return new_monitored_product
 
 
-@router.delete('/product')
-async def remove_product(session: Session = Depends(get_session)):
-    pass
+@router.delete('/product', status_code=status.HTTP_204_NO_CONTENT)
+async def remove_product(
+    monitored_product: MonitoredProductIn,
+    session: Session = Depends(get_session),
+):
+    monitored_product_from_db = session.exec(
+        select(MonitoredProductModel).where(
+            MonitoredProductModel.name == monitored_product.name
+        )
+    ).first()
+    if not monitored_product_from_db:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f'Monitored product with name {monitored_product.name} not exists!',
+        )
+    session.delete(monitored_product_from_db)
+    session.commit()
