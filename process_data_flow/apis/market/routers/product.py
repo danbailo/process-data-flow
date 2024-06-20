@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, Query, status
 from pydantic import UUID4
 from sqlmodel import Session, func, select
 
-from process_data_flow.apis.market.database import get_session
+from process_data_flow.apis.database import get_session
 from process_data_flow.apis.market.models import ProductModel
 from process_data_flow.commons.api import BuildListResponse
 from process_data_flow.schemas import ProductBody

@@ -2,7 +2,7 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 
-from process_data_flow.apis.market.database import init_db
+from process_data_flow.apis.database import init_db
 from process_data_flow.apis.market.routers import product
 from process_data_flow.commons.logger import Logger, LoggerFactory
 
