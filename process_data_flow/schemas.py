@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from polyfactory.factories.pydantic_factory import ModelFactory
 from pydantic import UUID4, BaseModel, Field
 
@@ -11,3 +13,12 @@ class ProductBody(BaseModel):
 
 class ProductFactory(ModelFactory[ProductBody]):
     __model__ = ProductBody
+
+
+class MonitoredProductIn(BaseModel):
+    name: str
+
+
+class MonitoredProductOut(MonitoredProductIn):
+    id: UUID4
+    created_at: datetime

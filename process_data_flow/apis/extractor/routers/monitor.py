@@ -1,18 +1,58 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends, HTTPException, Query, status
+from sqlmodel import Session, func, select
+
+from process_data_flow.apis.dependencies import get_session
+from process_data_flow.apis.extractor.models import MonitoredProductModel
+from process_data_flow.commons.api import BuildListResponse
+from process_data_flow.schemas import MonitoredProductIn, MonitoredProductOut
 
 router = APIRouter(prefix='/monitor', tags=['monitor'])
 
 
-@router.get('/products')
-async def show_monitored_products():
-    pass
+@router.get('/product')
+async def show_monitored_products(
+    page: int = Query(1, gt=0),
+    limit: int = Query(10, gt=0),
+    session: Session = Depends(get_session),
+):
+    offset = (page - 1) * limit
+    total_items = session.exec(
+        select(func.count()).select_from(MonitoredProductModel)
+    ).one()
+    monitored_products = session.exec(
+        select(MonitoredProductModel).offset(offset).limit(limit)
+    ).all()
+    to_return = BuildListResponse(
+        current_page=page,
+        limit=limit,
+        total_items=total_items,
+        items=monitored_products,
+    )
+    return to_return
 
 
-@router.post('/products')
-async def monitor_new_product():
-    pass
+@router.post(
+    '/product', response_model=MonitoredProductOut, status_code=status.HTTP_201_CREATED
+)
+async def monitor_new_product(
+    monitored_product: MonitoredProductIn, session: Session = Depends(get_session)
+):
+    monitored_product_from_db = session.exec(
+        select(MonitoredProductModel).where(
+            MonitoredProductModel.name == monitored_product.name
+        )
+    ).first()
+    if monitored_product_from_db:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail=f'Monitored product with name {monitored_product_from_db.name} already exists!',
+        )
+    new_monitored_product = MonitoredProductModel(**monitored_product.model_dump())
+    session.add(new_monitored_product)
+    session.commit()
+    return new_monitored_product
 
 
-@router.delete('/products')
-async def remove_product():
+@router.delete('/product')
+async def remove_product(session: Session = Depends(get_session)):
     pass
