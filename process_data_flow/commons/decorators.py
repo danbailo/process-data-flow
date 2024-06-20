@@ -6,8 +6,10 @@ import time
 from functools import wraps
 from math import ceil
 
+import redis
+
 from process_data_flow.commons.logger import Logger, LoggerFactory
-from process_data_flow.settings import REDIS_CLIENT
+from process_data_flow.settings import REDIS_CONNECTION_POOL
 
 _logger: Logger = LoggerFactory.new()
 
@@ -74,6 +76,8 @@ def timeout(seconds):
 
 
 def cache(ttl: int = 60, *, is_class_method: bool):
+    redis_client = redis.Redis(connection_pool=REDIS_CONNECTION_POOL)
+
     def decorator(function):
         @wraps(function)
         def wrapper(*args, **kwargs):
@@ -84,7 +88,7 @@ def cache(ttl: int = 60, *, is_class_method: bool):
                 f'{function.__name__}:'
                 + hashlib.md5((str(args) + str(kwargs)).encode()).hexdigest()
             )
-            cached_result = REDIS_CLIENT.get(key)
+            cached_result = redis_client.get(key)
             if cached_result:
                 try:
                     cached_result = json.loads(cached_result)
@@ -102,7 +106,7 @@ def cache(ttl: int = 60, *, is_class_method: bool):
             to_cache = result
             if not isinstance(to_cache, str):
                 to_cache = json.dumps(result)
-            REDIS_CLIENT.set(key, to_cache, ex=ttl)
+            redis_client.set(key, to_cache, ex=ttl)
             _logger.debug('Result cached!', ttl=ttl)
 
             return result
@@ -113,6 +117,8 @@ def cache(ttl: int = 60, *, is_class_method: bool):
 
 
 def async_cache(ttl: int = 60, *, is_class_method: bool):
+    redis_client = redis.Redis(connection_pool=REDIS_CONNECTION_POOL)
+
     def decorator(function):
         @wraps(function)
         async def wrapper(*args, **kwargs):
@@ -123,7 +129,7 @@ def async_cache(ttl: int = 60, *, is_class_method: bool):
                 f'{function.__name__}:'
                 + hashlib.md5((str(args) + str(kwargs)).encode()).hexdigest()
             )
-            cached_result = REDIS_CLIENT.get(key)
+            cached_result = redis_client.get(key)
             if cached_result:
                 try:
                     cached_result = json.loads(cached_result)
@@ -141,7 +147,7 @@ def async_cache(ttl: int = 60, *, is_class_method: bool):
             to_cache = result
             if not isinstance(to_cache, str):
                 to_cache = json.dumps(result)
-            REDIS_CLIENT.set(key, to_cache, ex=ttl)
+            redis_client.set(key, to_cache, ex=ttl)
             _logger.debug('Result cached!', ttl=ttl)
 
             return result

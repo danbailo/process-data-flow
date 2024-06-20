@@ -14,7 +14,7 @@ REDIS_CONFIG = {
     'decode_responses': os.getenv('REDIS_DECODE_RESPONSES') or True,
 }
 
-REDIS_CLIENT = redis.Redis(**REDIS_CONFIG)
+REDIS_CONNECTION_POOL = redis.ConnectionPool(**REDIS_CONFIG)
 
 
 CALLBACK_API_URL = os.getenv('CALLBACK_API_URL', 'http://localhost:8081')
