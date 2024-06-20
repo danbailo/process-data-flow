@@ -10,7 +10,7 @@ from process_data_flow.commons.logger import Logger, LoggerFactory
 from process_data_flow.commons.rabbitmq.client import RabbitMQClient
 from process_data_flow.commons.tenacity import warning_if_failed
 from process_data_flow.settings import (
-    CALLBACK_API_URL,
+    EXTRACT_API_URL,
     PRODUCT_CONSUMER_EXCHANGE,
     PRODUCT_CONSUMER_KEY,
     RETRY_AFTER_SECONDS,
@@ -33,7 +33,7 @@ class SendProductsToRabbitScheduler:
         before=warning_if_failed,
     )
     async def _get_products(self):
-        url = CALLBACK_API_URL + '/products'
+        url = EXTRACT_API_URL + '/products'
 
         async with httpx.AsyncClient() as client:
             response = await client.get(url)

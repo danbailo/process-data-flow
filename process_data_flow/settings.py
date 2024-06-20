@@ -5,6 +5,9 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+RETRY_ATTEMPTS = 7
+RETRY_AFTER_SECONDS = 3
+
 DATABASE_URL = os.getenv('DATABASE_URL', 'sqlite:///database.db')
 
 REDIS_CONFIG = {
@@ -16,14 +19,10 @@ REDIS_CONFIG = {
 
 REDIS_CONNECTION_POOL = redis.ConnectionPool(**REDIS_CONFIG)
 
-
-CALLBACK_API_URL = os.getenv('CALLBACK_API_URL', 'http://localhost:8081')
+EXTRACT_API_URL = os.getenv('EXTRACT_API_URL', 'http://localhost:8081')
 MARKET_API_URL = os.getenv('MARKET_API_URL', 'http://localhost:8082')
 
 RABBITMQ_HOST = os.getenv('RABBIT_HOST', 'localhost')
-
-RETRY_ATTEMPTS = 7
-RETRY_AFTER_SECONDS = 3
 
 MESSAGE_TTL = 300000
 
