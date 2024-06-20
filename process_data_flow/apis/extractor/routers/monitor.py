@@ -12,7 +12,7 @@ router = APIRouter(prefix='/monitor', tags=['monitor'])
 @router.get('/product')
 async def show_monitored_products(
     page: int = Query(1, gt=0),
-    limit: int = Query(10, gt=0),
+    limit: int = Query(30, gt=0),
     session: Session = Depends(get_session),
 ):
     offset = (page - 1) * limit
