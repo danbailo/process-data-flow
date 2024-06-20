@@ -8,7 +8,7 @@ from sqlmodel import Field, SQLModel
 class ProductModel(SQLModel, table=True):
     __tablename__ = 'product'
 
-    id: UUID4 = Field(default=uuid4(), primary_key=True, index=True)
+    id: UUID4 = Field(default_factory=uuid4, primary_key=True, index=True)
     name: str
     name_slug: str = Field(unique=True, index=True)
     price: float = Field(index=True)
