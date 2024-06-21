@@ -11,7 +11,7 @@ router = APIRouter(prefix='/extract-data', tags=['extract-data'])
 async def _get_monitored_products():
     url = EXTRACT_API_URL + '/monitor/product'
 
-    monitored_products = [] 
+    monitored_products = []
     page = 1
 
     while True:
@@ -28,7 +28,7 @@ async def _get_monitored_products():
     return monitored_products
 
 
-@router.get('/get')
+@router.get('')
 async def extract_data_from_monitored_products(
     page: int = Query(1, gt=0),
     limit: int = Query(30, gt=0),
@@ -54,7 +54,7 @@ async def extract_data_from_monitored_products(
     return to_return
 
 
-@router.get('/get/{product}')
+@router.get('/{product}')
 async def extract_data_from_product(product: str):
     magalu_scraper = MagaluScraper()
     items = await magalu_scraper.get_products_from_first_page(product)
