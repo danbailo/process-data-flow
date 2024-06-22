@@ -24,4 +24,4 @@ class ProductModel(SQLModel, table=True):
     infos: str | None
     created_at: datetime = Field(default=datetime.now(UTC))
 
-    url_id: UUID4 = Field(unique=True, foreign_key='extracted_url.id')
+    url_id: UUID4 = Field(foreign_key='extracted_url.id')

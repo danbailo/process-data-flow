@@ -1,10 +1,10 @@
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from pydantic import UUID4
 from slugify import slugify
-from sqlmodel import Session, func, or_, select
+from sqlmodel import Session, func, select
 
 from process_data_flow.apis.dependencies import get_session
-from process_data_flow.apis.market.models import ProductModel
+from process_data_flow.apis.market.models import ExtractedUrlModel, ProductModel
 from process_data_flow.commons.api import BuildListResponse
 from process_data_flow.schemas import ProductIn, ProductOut
 
@@ -29,13 +29,28 @@ async def get_products(
     session: Session = Depends(get_session),
 ):
     offset = (page - 1) * limit
-    query = select(ProductModel)
+    query = select(ProductModel, ExtractedUrlModel).join(
+        ExtractedUrlModel, ProductModel.url_id == ExtractedUrlModel.id
+    )
 
     products = session.exec(query.offset(offset).limit(limit)).all()
     total_items = session.exec(select(func.count()).select_from(query)).one()
 
+    items = [
+        ProductOut(
+            id=product.id,
+            name=product.name,
+            name_slug=product.name_slug,
+            price=product.price,
+            seller=product.seller,
+            infos=product.infos,
+            created_at=product.created_at,
+            url=extracted_url.url,
+        )
+        for product, extracted_url in products
+    ]
     to_return = BuildListResponse(
-        current_page=page, limit=limit, total_items=total_items, items=products
+        current_page=page, limit=limit, total_items=total_items, items=items
     )
     return to_return
 
@@ -44,21 +59,31 @@ async def get_products(
 async def create_product(product: ProductIn, session: Session = Depends(get_session)):
     product_name_slug = slugify(product.name)
     product_from_db = session.exec(
-        select(ProductModel).where(
-            or_(
-                ProductModel.name_slug == product_name_slug,
-                ProductModel.url == product.url,
-            )
-        )
+        select(ProductModel).where(ProductModel.name_slug == product_name_slug)
     ).first()
     if product_from_db:
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
-            detail=f'Item {product_from_db.id} already exists!',
+            detail=f'Item {product.name} already exists!',
         )
 
-    new_product = ProductModel(**product.model_dump(), name_slug=product_name_slug)
+    extracted_url_from_db = session.exec(
+        select(ExtractedUrlModel).where(ExtractedUrlModel.url == product.url)
+    ).first()
+    if not extracted_url_from_db:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f'The url {product.url} was not extracted!',
+        )
+
+    new_product = ProductModel(
+        **product.model_dump(),
+        name_slug=product_name_slug,
+        url_id=extracted_url_from_db.id,
+    )
+    to_return = new_product.model_dump(mode='json')
+    to_return.update({'url': extracted_url_from_db.url})
     session.add(new_product)
     session.commit()
 
-    return new_product
+    return to_return
