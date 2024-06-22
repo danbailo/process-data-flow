@@ -16,12 +16,11 @@ async def show_monitored_products(
     session: Session = Depends(get_session),
 ):
     offset = (page - 1) * limit
-    total_items = session.exec(
-        select(func.count()).select_from(MonitoredProductModel)
-    ).one()
-    monitored_products = session.exec(
-        select(MonitoredProductModel).offset(offset).limit(limit)
-    ).all()
+    query = select(MonitoredProductModel)
+
+    monitored_products = session.exec(query.offset(offset).limit(limit)).all()
+    total_items = session.exec(select(func.count()).select_from(query)).one()
+
     to_return = BuildListResponse(
         current_page=page,
         limit=limit,
