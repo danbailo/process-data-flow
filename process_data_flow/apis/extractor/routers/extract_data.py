@@ -55,10 +55,20 @@ async def extract_data_from_monitored_products(
 
 
 @router.get('/{product}')
-async def extract_data_from_product(product: str):
+async def extract_data_from_product(
+    product: str,
+    page: int = Query(1, gt=0),
+    limit: int = Query(30, gt=0),
+):
     magalu_scraper = MagaluScraper()
-    items = await magalu_scraper.get_products_from_first_page(product)
-    return {
-        'total_items': len(items),
-        'items': items,
-    }
+
+    extracted_data = await magalu_scraper.get_products_from_first_page(product)
+
+    offset = (page - 1) * limit
+    to_return = BuildListResponse(
+        current_page=page,
+        limit=limit,
+        total_items=len(extracted_data),
+        items=extracted_data[offset : limit * page],
+    )
+    return to_return
