@@ -24,6 +24,7 @@ async def get_product(id: UUID4, session: Session = Depends(get_session)):
 
 @router.get('')
 async def get_products(
+    url: str | None = None,
     page: int = Query(1, gt=0),
     limit: int = Query(30, gt=0),
     session: Session = Depends(get_session),
@@ -32,6 +33,9 @@ async def get_products(
     query = select(ProductModel, ExtractedUrlModel).join(
         ExtractedUrlModel, ProductModel.url_id == ExtractedUrlModel.id
     )
+
+    if url:
+        query = query.where(ExtractedUrlModel.url == url)
 
     products = session.exec(query.offset(offset).limit(limit)).all()
     total_items = session.exec(select(func.count()).select_from(query)).one()
