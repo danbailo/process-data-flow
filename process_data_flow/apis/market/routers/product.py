@@ -1,11 +1,12 @@
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from pydantic import UUID4
-from sqlmodel import Session, func, select
+from slugify import slugify
+from sqlmodel import Session, func, or_, select
 
 from process_data_flow.apis.dependencies import get_session
 from process_data_flow.apis.market.models import ProductModel
 from process_data_flow.commons.api import BuildListResponse
-from process_data_flow.schemas import ProductBody
+from process_data_flow.schemas import ProductIn, ProductOut
 
 router = APIRouter(prefix='/product', tags=['product'])
 
@@ -28,25 +29,36 @@ async def get_products(
     session: Session = Depends(get_session),
 ):
     offset = (page - 1) * limit
-    total_items = session.exec(select(func.count()).select_from(ProductModel)).one()
-    products = session.exec(select(ProductModel).offset(offset).limit(limit)).all()
+    query = select(ProductModel)
+
+    products = session.exec(query.offset(offset).limit(limit)).all()
+    total_items = session.exec(select(func.count()).select_from(query)).one()
+
     to_return = BuildListResponse(
         current_page=page, limit=limit, total_items=total_items, items=products
     )
     return to_return
 
 
-@router.post('', response_model=ProductBody, status_code=status.HTTP_201_CREATED)
-async def create_product(product: ProductBody, session: Session = Depends(get_session)):
+@router.post('', response_model=ProductOut, status_code=status.HTTP_201_CREATED)
+async def create_product(product: ProductIn, session: Session = Depends(get_session)):
+    product_name_slug = slugify(product.name)
     product_from_db = session.exec(
-        select(ProductModel).where(ProductModel.id == product.id)
+        select(ProductModel).where(
+            or_(
+                ProductModel.name_slug == product_name_slug,
+                ProductModel.url == product.url,
+            )
+        )
     ).first()
     if product_from_db:
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
-            detail=f'Item with ID {product_from_db.id} already exists!',
+            detail=f'Item {product_from_db.id} already exists!',
         )
-    new_product = ProductModel(**product.model_dump())
+
+    new_product = ProductModel(**product.model_dump(), name_slug=product_name_slug)
     session.add(new_product)
     session.commit()
+
     return new_product
