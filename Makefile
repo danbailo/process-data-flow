@@ -11,6 +11,9 @@ install:
 	@poetry install --no-root
 	@echo "\nProject installed!"
 
+init_containers:
+	@docker compose up -d
+
 check_format:
 	@poetry run ruff format $(SOURCE) --check
 	@poetry run ruff format $(TESTS) --check

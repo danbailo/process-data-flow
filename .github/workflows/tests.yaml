@@ -46,8 +46,8 @@ jobs:
     - name: Run types check
       run: make check_types
 
-    - name: Start containers
-      run: docker compose up -d
+    - name: Init containers
+      run: make init_containers
 
     - name: Run tests
       run: make test
