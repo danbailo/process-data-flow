@@ -15,6 +15,29 @@ class ProductFactory(ModelFactory[ProductBody]):
     __model__ = ProductBody
 
 
+class ProductIn(BaseModel):
+    name: str
+    price: float
+    url: str
+    seller: str
+    infos: str | None = None
+
+
+class ProductOut(ProductIn):
+    id: UUID4
+    name_slug: str
+    created_at: datetime
+
+
+class ExtractedUrlIn(BaseModel):
+    url: str
+
+
+class ExtractedUrlOut(ExtractedUrlIn):
+    id: UUID4
+    created_at: datetime
+
+
 class MonitoredProductIn(BaseModel):
     name: str
 

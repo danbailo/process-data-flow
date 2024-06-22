@@ -3,7 +3,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 
 from process_data_flow.apis.database import init_db
-from process_data_flow.apis.market.routers import product
+from process_data_flow.apis.market.routers import extracted_url, product
 from process_data_flow.commons.logger import Logger, LoggerFactory
 
 _logger: Logger = LoggerFactory.new()
@@ -20,6 +20,7 @@ async def lifespan(app: FastAPI):
 app = FastAPI(title='Market API', lifespan=lifespan)
 
 app.include_router(product.router)
+app.include_router(extracted_url.router)
 
 
 @app.get('/health')
