@@ -13,3 +13,7 @@ def random_generate_fake_products() -> list[ProductBody]:
         return []
     size = random.randint(1, 10)
     return generate_fake_products(size)
+
+
+def convert_seconds_to_milliseconds(value: int):
+    return value * 1000

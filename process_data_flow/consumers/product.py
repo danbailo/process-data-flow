@@ -11,6 +11,7 @@ from process_data_flow.commons.rabbitmq.consumer import (
 )
 from process_data_flow.commons.requests import MethodRequestEnum, make_async_request
 from process_data_flow.commons.tenacity import warning_if_failed
+from process_data_flow.services.extract_data import FormatExtractedUrl
 from process_data_flow.settings import (
     MARKET_API_URL,
     MARKET_QUERY_EXCHANGE,
@@ -72,18 +73,19 @@ class ProductConsumer(RabbitMQConsumer):
         properties: BasicProperties,
         body: bytes,
     ):
-        message = body.decode()
-        response = asyncio.run(self._get_extracted_url(message))
+        format_extracted_url = FormatExtractedUrl(self.logger)
+        data = format_extracted_url.execute(body)
+        response = asyncio.run(self._get_extracted_url(data))
 
         if response.status_code == 200 and response.json()['items']:
             raise ItemAlreadyExists(requeue=False)
 
-        asyncio.run(self._create_extracted_url(message))
+        asyncio.run(self._create_extracted_url(data))
 
         self.client.send_message(
             exchange=MARKET_QUERY_EXCHANGE,
             routing_key=MARKET_QUERY_KEY,
-            body=message,
+            body=data,
         )
 
 

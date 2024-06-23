@@ -7,10 +7,10 @@ from process_data_flow.settings import (
     MARKET_QUERY_EXCHANGE,
     MARKET_QUERY_KEY,
     MARKET_QUERY_QUEUE,
-    MESSAGE_TTL,
     PRODUCT_CONSUMER_EXCHANGE,
     PRODUCT_CONSUMER_KEY,
     PRODUCT_CONSUMER_QUEUE,
+    REDIS_MESSAGE_TTL,
     REGISTER_PRODUCT_DL_KEY,
     REGISTER_PRODUCT_DLQ,
     REGISTER_PRODUCT_DLX,
@@ -18,6 +18,7 @@ from process_data_flow.settings import (
     REGISTER_PRODUCT_KEY,
     REGISTER_PRODUCT_QUEUE,
 )
+from process_data_flow.utils import convert_seconds_to_milliseconds
 
 
 class RabbitMQConfig:
@@ -66,7 +67,7 @@ class RabbitMQConfig:
         self.client.channel.queue_declare(
             queue=MARKET_QUERY_DLQ,
             arguments={
-                'x-message-ttl': MESSAGE_TTL,
+                'x-message-ttl': convert_seconds_to_milliseconds(REDIS_MESSAGE_TTL),
                 'x-dead-letter-exchange': MARKET_QUERY_EXCHANGE,
                 'x-dead-letter-routing-key': MARKET_QUERY_KEY,
             },
@@ -102,7 +103,7 @@ class RabbitMQConfig:
         self.client.channel.queue_declare(
             queue=REGISTER_PRODUCT_DLQ,
             arguments={
-                'x-message-ttl': MESSAGE_TTL,
+                'x-message-ttl': convert_seconds_to_milliseconds(REDIS_MESSAGE_TTL),
                 'x-dead-letter-exchange': REGISTER_PRODUCT_EXCHANGE,
                 'x-dead-letter-routing-key': REGISTER_PRODUCT_KEY,
             },

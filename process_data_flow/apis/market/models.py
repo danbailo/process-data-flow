@@ -19,6 +19,7 @@ class ProductModel(SQLModel, table=True):
     id: UUID4 = Field(default_factory=uuid4, primary_key=True, index=True)
     name: str
     name_slug: str = Field(unique=True, index=True)
+    code: str = Field(unique=True, index=True)
     price: float = Field(index=True)
     seller: str = Field(index=True)
     infos: str | None

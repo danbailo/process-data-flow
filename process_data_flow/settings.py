@@ -24,7 +24,9 @@ MARKET_API_URL = os.getenv('MARKET_API_URL', 'http://localhost:8082')
 
 RABBITMQ_HOST = os.getenv('RABBIT_HOST', 'localhost')
 
-MESSAGE_TTL = 300000
+REDIS_CACHE_TTL = 1800  # Time in seconds -> 30 minutes
+
+REDIS_MESSAGE_TTL = 1800  # Time in seconds -> 30 minutes
 
 PRODUCT_CONSUMER_EXCHANGE = 'product_consumer.exchange'
 PRODUCT_CONSUMER_QUEUE = 'product_consumer.queue'
