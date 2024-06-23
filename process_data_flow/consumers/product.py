@@ -1,6 +1,5 @@
 import asyncio
 
-import httpx
 from pika.channel import Channel
 from pika.spec import Basic, BasicProperties
 from tenacity import retry, stop_after_attempt, wait_fixed
@@ -8,9 +7,10 @@ from tenacity import retry, stop_after_attempt, wait_fixed
 from process_data_flow.commons.rabbitmq.consumer import (
     RabbitMQConsumer,
     RabbitMQConsumerOptions,
+    RabbitMQException,
 )
+from process_data_flow.commons.requests import MethodRequestEnum, make_async_request
 from process_data_flow.commons.tenacity import warning_if_failed
-from process_data_flow.services.product import FormatProductService
 from process_data_flow.settings import (
     MARKET_API_URL,
     MARKET_QUERY_EXCHANGE,
@@ -21,9 +21,15 @@ from process_data_flow.settings import (
 )
 
 
-class ItemAlreadyExists(Exception):
-    def __init__(self, message: str = 'Item already exists in database!') -> None:
-        super().__init__(message)
+class ItemAlreadyExists(RabbitMQException):
+    message: str = 'Item already exists in database!'
+
+    def __init__(
+        self, message: str | None = None, requeue: bool = True, *args: object
+    ) -> None:
+        if not message:
+            message = self.message
+        super().__init__(message, requeue, *args)
 
 
 class ProductConsumer(RabbitMQConsumer):
@@ -39,18 +45,11 @@ class ProductConsumer(RabbitMQConsumer):
         wait=wait_fixed(RETRY_AFTER_SECONDS),
         before=warning_if_failed,
     )
-    async def _get_product(self, id: str):
-        url = MARKET_API_URL + f'/product/{id}'
-
-        async with httpx.AsyncClient() as client:
-            response = await client.get(url)
-
-        data = response.json()
-        if isinstance(data, dict) and ('not exists' in data.get('detail', '')):
-            return response
-
-        response.raise_for_status()
-
+    async def _get_extracted_url(self, url: str):
+        url_ = MARKET_API_URL + '/extracted-url'
+        response = await make_async_request(
+            MethodRequestEnum.GET, url_, params={'url': url}
+        )
         return response
 
     @retry(
@@ -59,13 +58,11 @@ class ProductConsumer(RabbitMQConsumer):
         wait=wait_fixed(RETRY_AFTER_SECONDS),
         before=warning_if_failed,
     )
-    async def _create_product(self, data: dict):
-        url = MARKET_API_URL + '/product'
-
-        async with httpx.AsyncClient() as client:
-            response = await client.post(url, json=data)
-        response.raise_for_status()
-
+    async def _create_extracted_url(self, url: str):
+        url_ = MARKET_API_URL + '/extracted-url'
+        response = await make_async_request(
+            MethodRequestEnum.POST, url_, json={'url': url}
+        )
         return response
 
     def _execute(
@@ -75,20 +72,18 @@ class ProductConsumer(RabbitMQConsumer):
         properties: BasicProperties,
         body: bytes,
     ):
-        format_product_service = FormatProductService(self.logger)
-        product = format_product_service.execute(body)
+        message = body.decode()
+        response = asyncio.run(self._get_extracted_url(message))
 
-        response = asyncio.run(self._get_product(product.id))
+        if response.status_code == 200 and response.json()['items']:
+            raise ItemAlreadyExists(requeue=False)
 
-        if response.status_code == 200:
-            raise ItemAlreadyExists()
-
-        asyncio.run(self._create_product(product.model_dump(mode='json')))
+        asyncio.run(self._create_extracted_url(message))
 
         self.client.send_message(
             exchange=MARKET_QUERY_EXCHANGE,
             routing_key=MARKET_QUERY_KEY,
-            body=product.id.hex,
+            body=message,
         )
 
 

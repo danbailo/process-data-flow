@@ -8,6 +8,12 @@ from process_data_flow.commons.logger import Logger, LoggerFactory
 from process_data_flow.commons.rabbitmq.client import RabbitMQClient
 
 
+class RabbitMQException(Exception):
+    def __init__(self, message: str | None = None, requeue: bool = True) -> None:
+        self.requeue = requeue
+        super().__init__(message)
+
+
 class RabbitMQConsumerOptions(BaseModel):
     queue: str
     auto_ack: bool = False
@@ -53,10 +59,12 @@ class RabbitMQConsumer(ABC):
             ch.basic_ack(delivery_tag=method.delivery_tag)
             self.logger.info('Message consumed with sucessfully!')
 
-        except Exception:
-            ch.basic_nack(
-                delivery_tag=method.delivery_tag, requeue=self.options.requeue
-            )
+        except Exception as err:
+            requeue = getattr(err, 'requeue', None)
+            if requeue is None:
+                requeue = self.options.requeue
+
+            ch.basic_nack(delivery_tag=method.delivery_tag, requeue=requeue)
             self.logger.exception('An error has occured when consuming message!')
 
     def consume(self):
