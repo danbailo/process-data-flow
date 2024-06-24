@@ -14,14 +14,6 @@ class SendDataToRabbitMQService:
 
     def execute(self, *, items: list, exchange: str, routing_key: str):
         for item in items:
-            # self.logger.debug(
-            #     'Item sent to RabbitMQ',
-            #     data=dict(
-            #         item=item,
-            #         exchange=exchange,
-            #         routing_key=routing_key,
-            #     ),
-            # )
             self.rabbitmq_client.send_message(
                 body=json.dumps(item),
                 exchange=exchange,
