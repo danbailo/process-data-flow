@@ -1,4 +1,3 @@
-
 import asyncio
 
 from process_data_flow.clients.extractor import ExtractorAPIClient

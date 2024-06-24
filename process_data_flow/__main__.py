@@ -1,14 +1,13 @@
+import time
+
 import uvicorn
 from typer import Option, Typer
 
 from process_data_flow.commons.logger import Logger, LoggerFactory
+from process_data_flow.commons.mp_scheduler import MPScheduler
+from process_data_flow.services.product import SendExtractDataToProductQueueService
 
 logger: Logger = LoggerFactory.new()
-
-import time
-
-from process_data_flow.commons.mp_scheduler import MPScheduler
-from process_data_flow.services.extract_data import SendExtractedDataService
 
 app = Typer()
 
@@ -31,10 +30,12 @@ def market(
 
 
 @scheduler.command()
-def send_extract_data_to_rabbitmq(seconds: int = Option(default=60)):
+def send_extract_data_to_rabbitmq(seconds: int = Option(default=3600)):
     mp_sched = MPScheduler()
 
-    mp_sched.every(seconds).seconds.do(SendExtractedDataService().execute)
+    mp_sched.every(seconds).seconds.do(
+        SendExtractDataToProductQueueService().execute,
+    )
 
     while True:
         mp_sched.run_pending()
