@@ -17,6 +17,7 @@ class ProductFactory(ModelFactory[ProductBody]):
 
 class ProductIn(BaseModel):
     name: str
+    code: str
     price: float
     url: str
     seller: str

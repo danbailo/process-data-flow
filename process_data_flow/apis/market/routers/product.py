@@ -25,6 +25,8 @@ async def get_product(id: UUID4, session: Session = Depends(get_session)):
 @router.get('')
 async def get_products(
     url: str | None = None,
+    name_slug: str | None = None,
+    code: str | None = None,
     page: int = Query(1, gt=0),
     limit: int = Query(30, gt=0),
     session: Session = Depends(get_session),
@@ -34,6 +36,10 @@ async def get_products(
         ExtractedUrlModel, ProductModel.url_id == ExtractedUrlModel.id
     )
 
+    if code:
+        query = query.where(ProductModel.code == code)
+    if name_slug:
+        query = query.where(ProductModel.name_slug == name_slug)
     if url:
         query = query.where(ExtractedUrlModel.url == url)
 
@@ -45,6 +51,7 @@ async def get_products(
             id=product.id,
             name=product.name,
             name_slug=product.name_slug,
+            code=product.code,
             price=product.price,
             seller=product.seller,
             infos=product.infos,
@@ -61,9 +68,8 @@ async def get_products(
 
 @router.post('', response_model=ProductOut, status_code=status.HTTP_201_CREATED)
 async def create_product(product: ProductIn, session: Session = Depends(get_session)):
-    product_name_slug = slugify(product.name)
     product_from_db = session.exec(
-        select(ProductModel).where(ProductModel.name_slug == product_name_slug)
+        select(ProductModel).where(ProductModel.code == product.code)
     ).first()
     if product_from_db:
         raise HTTPException(
@@ -82,7 +88,7 @@ async def create_product(product: ProductIn, session: Session = Depends(get_sess
 
     new_product = ProductModel(
         **product.model_dump(),
-        name_slug=product_name_slug,
+        name_slug=slugify(product.name),
         url_id=extracted_url_from_db.id,
     )
     to_return = new_product.model_dump(mode='json')
