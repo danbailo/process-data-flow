@@ -1,3 +1,4 @@
+import time
 from abc import ABC, abstractmethod
 
 from pika.channel import Channel
@@ -9,7 +10,7 @@ from process_data_flow.commons.rabbitmq.client import RabbitMQClient
 
 
 class RabbitMQException(Exception):
-    def __init__(self, message: str | None = None, requeue: bool = True) -> None:
+    def __init__(self, message: str | None = None, requeue: bool | None = None) -> None:
         self.requeue = requeue
         super().__init__(message)
 
@@ -21,6 +22,7 @@ class RabbitMQConsumerOptions(BaseModel):
     # consumer_tag=None
     arguments: dict = None
     requeue: bool = True
+    prefetch_count: int = 1
 
 
 class RabbitMQConsumer(ABC):
@@ -29,9 +31,8 @@ class RabbitMQConsumer(ABC):
     ):
         self.client = RabbitMQClient()
         self.logger = logger
-        self.client.channel.basic_qos(prefetch_count=1)
-
         self.options = options
+        self.client.channel.basic_qos(prefetch_count=self.options.prefetch_count)
 
     @abstractmethod
     def _execute(
@@ -66,6 +67,8 @@ class RabbitMQConsumer(ABC):
 
             ch.basic_nack(delivery_tag=method.delivery_tag, requeue=requeue)
             self.logger.exception('An error has occured when consuming message!')
+
+        time.sleep(1)
 
     def consume(self):
         self.logger.info('Starting consumer...', monitoring=self.options.model_dump())
