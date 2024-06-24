@@ -38,12 +38,3 @@ class BaseScraper(ABC):
     def build_html(self, response: httpx.Response) -> html.HtmlElement:
         parsed_html: html.HtmlElement = html.fromstring(response.content)
         return parsed_html
-
-    def get_elements_from_page(
-        self, response: httpx.Response, xpath: str
-    ) -> list[html.HtmlElement]:
-        parsed_html = self.build_html(response)
-        elements = parsed_html.xpath(xpath)
-        self.logger.info(f'Extracted {len(elements)} elements')
-        return elements
-

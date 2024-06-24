@@ -37,6 +37,7 @@ async def make_async_request(
     files: list[tuple[str, tuple[str, bytes]]] = None,
     timeout: int = 120,
     auth: tuple[str, str] | None = None,
+    follow_redirects: bool = True,
     raise_for_status: bool = True,
 ) -> Response:
     _logger.debug(
@@ -52,6 +53,7 @@ async def make_async_request(
             files=files,
             timeout=timeout,
             auth=auth,
+            follow_redirects=follow_redirects,
         ),
     )
 
@@ -69,6 +71,7 @@ async def make_async_request(
             timeout=timeout,
             auth=auth,
             files=files,
+            follow_redirects=follow_redirects,
         )
     if raise_for_status:
         response.raise_for_status()
@@ -93,6 +96,7 @@ def make_request(
     files: list[tuple[str, tuple[str, bytes]]] = None,
     timeout: int = 120,
     auth: Optional[tuple[str, str]] = None,
+    follow_redirects: bool = True,
     raise_for_status: bool = True,
 ) -> Response:
     _logger.debug(
@@ -108,6 +112,7 @@ def make_request(
             files=files,
             timeout=timeout,
             auth=auth,
+            follow_redirects=follow_redirects,
         ),
     )
 
@@ -124,6 +129,7 @@ def make_request(
         timeout=timeout,
         auth=auth,
         files=files,
+        follow_redirects=follow_redirects,
     )
     if raise_for_status:
         response.raise_for_status()

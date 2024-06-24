@@ -7,11 +7,11 @@ from tenacity import retry, stop_after_attempt, wait_fixed
 from process_data_flow.commons.rabbitmq.consumer import (
     RabbitMQConsumer,
     RabbitMQConsumerOptions,
-    RabbitMQException,
 )
 from process_data_flow.commons.requests import MethodRequestEnum, make_async_request
 from process_data_flow.commons.tenacity import warning_if_failed
-from process_data_flow.services.extract_data import FormatExtractedUrl
+from process_data_flow.consumers.exceptions import ItemAlreadyExists
+from process_data_flow.services.extract_data import FormatExtractedUrlService
 from process_data_flow.settings import (
     MARKET_API_URL,
     MARKET_QUERY_EXCHANGE,
@@ -20,17 +20,6 @@ from process_data_flow.settings import (
     RETRY_AFTER_SECONDS,
     RETRY_ATTEMPTS,
 )
-
-
-class ItemAlreadyExists(RabbitMQException):
-    message: str = 'Item already exists in database!'
-
-    def __init__(
-        self, message: str | None = None, requeue: bool = True, *args: object
-    ) -> None:
-        if not message:
-            message = self.message
-        super().__init__(message, requeue, *args)
 
 
 class ProductConsumer(RabbitMQConsumer):
@@ -73,7 +62,7 @@ class ProductConsumer(RabbitMQConsumer):
         properties: BasicProperties,
         body: bytes,
     ):
-        format_extracted_url = FormatExtractedUrl(self.logger)
+        format_extracted_url = FormatExtractedUrlService(self.logger)
         data = format_extracted_url.execute(body)
         response = asyncio.run(self._get_extracted_url(data))
 
