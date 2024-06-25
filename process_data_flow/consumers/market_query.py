@@ -21,8 +21,15 @@ from process_data_flow.settings import (
 
 
 class MarketQueryConsumer(RabbitMQConsumer):
-    def __init__(self, market_api_client: MarketAPIClient = MarketAPIClient()) -> None:
-        options = RabbitMQConsumerOptions(queue=MARKET_QUERY_QUEUE, requeue=False)
+    queue: str = MARKET_QUERY_QUEUE
+
+    def __init__(
+        self,
+        market_api_client: MarketAPIClient = MarketAPIClient(),
+        options: RabbitMQConsumerOptions = RabbitMQConsumerOptions(),
+    ):
+        options.queue = self.queue
+        options.requeue = False
         super().__init__(options=options)
 
         self.market_api_client = market_api_client
@@ -46,6 +53,7 @@ class MarketQueryConsumer(RabbitMQConsumer):
         )
 
         if response.status_code == 200 and response.json()['items']:
+            breakpoint()
             raise ItemAlreadyExists(requeue=False)
 
         formatted_data['url'] = message

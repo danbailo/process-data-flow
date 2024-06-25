@@ -16,7 +16,7 @@ class RabbitMQException(Exception):
 
 
 class RabbitMQConsumerOptions(BaseModel):
-    queue: str
+    queue: str = None
     auto_ack: bool = False
     exclusive: bool = False
     # consumer_tag=None
