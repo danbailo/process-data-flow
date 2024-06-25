@@ -35,7 +35,8 @@ class FormatExtractedDataFromUrlService:
 
     def _format_price_value(self, value: str) -> float:
         value_to_return = value.strip().encode('ascii', 'ignore').decode()
-        value_to_return = value_to_return.removeprefix('R$').replace(',', '.')
+        value_to_return = value_to_return.replace('.', '').replace(',', '.')
+        value_to_return = value_to_return.removeprefix('R$')
         return float(value_to_return)
 
     def _format_extracted_data_from_url(self, extracted_data: dict) -> dict:
