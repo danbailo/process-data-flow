@@ -1,31 +1,10 @@
 from fastapi import APIRouter, Query
 
+from process_data_flow.clients.extractor import ExtractorAPIClient
 from process_data_flow.commons.api import BuildListResponse
-from process_data_flow.commons.requests import MethodRequestEnum, make_async_request
 from process_data_flow.scrapers.magalu import MagaluScraper
-from process_data_flow.settings import EXTRACT_API_URL
 
 router = APIRouter(prefix='/extract-data', tags=['extract-data'])
-
-
-async def _get_monitored_products():
-    url = EXTRACT_API_URL + '/monitor/product'
-
-    monitored_products = []
-    page = 1
-
-    while True:
-        response = await make_async_request(
-            MethodRequestEnum.GET, url, params={'page': page, 'limit': 5}
-        )
-        data = response.json()
-        monitored_products.extend(data['items'])
-
-        if page == data['total_pages']:
-            break
-        page += 1
-
-    return monitored_products
 
 
 @router.get('')
@@ -35,8 +14,8 @@ async def extract_data_from_monitored_products(
 ):
     magalu_scraper = MagaluScraper()
 
-    monitored_products = await _get_monitored_products()
-
+    extractor_api_client = ExtractorAPIClient()
+    monitored_products = await extractor_api_client.get_monitored_products()
     extracted_data = []
     for monitored_product in monitored_products:
         extracted_data.extend(

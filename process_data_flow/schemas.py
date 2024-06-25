@@ -26,7 +26,6 @@ class ProductIn(BaseModel):
 
 class ProductOut(ProductIn):
     id: UUID4
-    name_slug: str
     created_at: datetime
 
 
