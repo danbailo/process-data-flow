@@ -22,7 +22,6 @@ class RabbitMQConsumerOptions(BaseModel):
     # consumer_tag=None
     arguments: dict = None
     requeue: bool = True
-    prefetch_count: int = 1
 
 
 class RabbitMQConsumer(ABC):
@@ -32,7 +31,7 @@ class RabbitMQConsumer(ABC):
         self.client = RabbitMQClient()
         self.logger = logger
         self.options = options
-        self.client.channel.basic_qos(prefetch_count=self.options.prefetch_count)
+        self.client.channel.basic_qos(prefetch_count=1)
 
     @abstractmethod
     def _execute(
