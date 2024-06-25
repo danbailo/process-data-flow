@@ -1,6 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from pydantic import UUID4
-from slugify import slugify
 from sqlmodel import Session, func, select
 
 from process_data_flow.apis.dependencies import get_session
@@ -25,7 +24,6 @@ async def get_product(id: UUID4, session: Session = Depends(get_session)):
 @router.get('')
 async def get_products(
     url: str | None = None,
-    name_slug: str | None = None,
     code: str | None = None,
     page: int = Query(1, gt=0),
     limit: int = Query(30, gt=0),
@@ -38,8 +36,6 @@ async def get_products(
 
     if code:
         query = query.where(ProductModel.code == code)
-    if name_slug:
-        query = query.where(ProductModel.name_slug == name_slug)
     if url:
         query = query.where(ExtractedUrlModel.url == url)
 
@@ -50,7 +46,6 @@ async def get_products(
         ProductOut(
             id=product.id,
             name=product.name,
-            name_slug=product.name_slug,
             code=product.code,
             price=product.price,
             seller=product.seller,
@@ -88,7 +83,6 @@ async def create_product(product: ProductIn, session: Session = Depends(get_sess
 
     new_product = ProductModel(
         **product.model_dump(),
-        name_slug=slugify(product.name),
         url_id=extracted_url_from_db.id,
     )
     to_return = new_product.model_dump(mode='json')
