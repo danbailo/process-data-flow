@@ -1,12 +1,7 @@
-from fastapi import APIRouter, Query
+from fastapi import APIRouter
 
-from process_data_flow.clients.magalu import MagaluAPIClient
-from process_data_flow.commons.api import BuildListResponse
-from process_data_flow.scrapers.magalu import MagaluScraper
-
-from process_data_flow.commons.requests import make_async_request, MethodRequestEnum
-from process_data_flow.settings import MAGALU_API_URL
 from process_data_flow.schemas import ExtractedUrlIn
+from process_data_flow.scrapers.magalu import MagaluScraper
 
 router = APIRouter(prefix='/extract-data', tags=['extract-data'])
 

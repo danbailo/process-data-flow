@@ -6,6 +6,7 @@ from process_data_flow.scrapers.magalu import MagaluScraper
 
 router = APIRouter(prefix='/search', tags=['search'])
 
+
 @router.get('')
 async def get_urls_from_monitored_products(
     page: int = Query(1, gt=0),

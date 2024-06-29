@@ -3,8 +3,8 @@ import asyncio
 from pika.channel import Channel
 from pika.spec import Basic, BasicProperties
 
-from process_data_flow.clients.market import MarketAPIClient
 from process_data_flow.clients.magalu import MagaluAPIClient
+from process_data_flow.clients.market import MarketAPIClient
 from process_data_flow.commons.rabbitmq.consumer import (
     RabbitMQConsumer,
     RabbitMQConsumerOptions,

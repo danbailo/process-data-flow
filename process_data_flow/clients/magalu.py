@@ -32,5 +32,7 @@ class MagaluAPIClient(BaseAPIClient):
 
     async def extract_data_from_product(self, url: str):
         url_ = MAGALU_API_URL + '/extract-data'
-        extracted_data = await make_async_request(MethodRequestEnum.POST, url_, json={'url': url})
+        extracted_data = await make_async_request(
+            MethodRequestEnum.POST, url_, json={'url': url}
+        )
         return extracted_data.json()
