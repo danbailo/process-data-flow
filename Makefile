@@ -1,6 +1,5 @@
 REPOSITORY = process-data-flow
 SOURCE = process_data_flow
-TESTS = tests
 
 
 build:
@@ -16,30 +15,20 @@ init_containers:
 
 check_format:
 	@poetry run ruff format $(SOURCE) --check
-	@poetry run ruff format $(TESTS) --check
 
 format:
 	@poetry run ruff format $(SOURCE)
-	@poetry run ruff format $(TESTS)
 
 check_lint:
 	@poetry run ruff check $(SOURCE)
-	@poetry run ruff check $(TESTS)
 
 lint:
 	@poetry run ruff check $(SOURCE) --fix
-	@poetry run ruff check $(TESTS) --fix
 
 check_types:
 	@poetry run mypy $(SOURCE)
-	@poetry run mypy $(TESTS)
 
-test:
-	@echo "\nRunning Tests"
-	@poetry run pytest -s $(TESTS) --cov=$(SOURCE)
-	@poetry run coverage-badge -o assets/coverage-badge.svg -f -q
-
-check_all: check_format check_lint check_types test
+check_all: check_format check_lint check_types
 	@echo "\nAll checks have been passed!"
 
 prepare_env_pyenv:

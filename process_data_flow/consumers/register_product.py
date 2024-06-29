@@ -33,4 +33,4 @@ class RegisterProductConsumer(RabbitMQConsumer):
         response = asyncio.run(market_api_client.get_product_by_id(message))
         data = response.json()
 
-        register_product_crawler.submit_form(data)
+        asyncio.run(register_product_crawler.submit_form(data))
