@@ -64,7 +64,3 @@ class MarketQueryConsumer(RabbitMQConsumer):
             routing_key=REGISTER_PRODUCT_KEY,
             body=response.json()['id'],
         )
-
-
-if __name__ == '__main__':
-    MarketQueryConsumer().consume()

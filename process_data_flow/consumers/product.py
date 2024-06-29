@@ -46,7 +46,3 @@ class ProductConsumer(RabbitMQConsumer):
             routing_key=MARKET_QUERY_KEY,
             body=data,
         )
-
-
-if __name__ == '__main__':
-    ProductConsumer().consume()
