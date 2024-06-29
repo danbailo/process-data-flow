@@ -8,6 +8,7 @@ from process_data_flow.commons.mp_scheduler import MPScheduler
 from process_data_flow.commons.rabbitmq.consumer import RabbitMQConsumerOptions
 from process_data_flow.consumers.market_query import MarketQueryConsumer
 from process_data_flow.consumers.product import ProductConsumer
+from process_data_flow.consumers.register_product import RegisterProductConsumer
 from process_data_flow.services.product import SendExtractDataToProductQueueService
 
 logger: Logger = LoggerFactory.new()
@@ -74,6 +75,21 @@ def market_query(
     )
     market_query_consumer = MarketQueryConsumer(options=options)
     market_query_consumer.consume()
+
+
+@consumer.command()
+def register_product(
+    auto_ack: bool = Option(default=False),
+    exclusive: bool = Option(default=False),
+    requeue: bool = Option(default=True),
+):
+    options = RabbitMQConsumerOptions(
+        auto_ack=auto_ack,
+        exclusive=exclusive,
+        requeue=requeue,
+    )
+    register_product_consumer = RegisterProductConsumer(options=options)
+    register_product_consumer.consume()
 
 
 app.add_typer(api, name='api')

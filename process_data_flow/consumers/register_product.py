@@ -7,6 +7,7 @@ from process_data_flow.clients.market import MarketAPIClient
 from process_data_flow.commons.rabbitmq.consumer import (
     RabbitMQConsumer,
     RabbitMQConsumerOptions,
+    RabbitMQException,
 )
 from process_data_flow.crawlers.register_product import RegisterProductCrawler
 from process_data_flow.settings import REGISTER_PRODUCT_QUEUE
@@ -33,4 +34,10 @@ class RegisterProductConsumer(RabbitMQConsumer):
         response = asyncio.run(market_api_client.get_product_by_id(message))
         data = response.json()
 
-        asyncio.run(register_product_crawler.submit_form(data))
+        try:
+            asyncio.run(register_product_crawler.submit_form(data))
+        except Exception as exc:
+            self.logger.exception(
+                'Error when trying to register a product.', message=message
+            )
+            raise RabbitMQException(message=str(exc), requeue=False)

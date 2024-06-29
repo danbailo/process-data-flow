@@ -12,11 +12,6 @@ class BaseCrawler(ABC):
         self._client: httpx.AsyncClient = None
         self.logger = logger
 
-    def __del__(self):
-        if self._client is not None and not self._client.is_closed:
-            self.logger.debug('Closing client...')
-            asyncio.run(self._client.aclose())
-
     @property
     def client(self):
         if self._client is None or self._client.is_closed:
