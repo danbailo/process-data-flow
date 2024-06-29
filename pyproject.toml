@@ -23,6 +23,7 @@ sqlmodel = "^0.0.19"
 lxml = "^5.2.2"
 redis = "^5.0.6"
 python-slugify = "^8.0.4"
+dateparser = "^1.2.0"
 
 [tool.poetry.group.dev.dependencies]
 ipdb = "^0.13.13"
