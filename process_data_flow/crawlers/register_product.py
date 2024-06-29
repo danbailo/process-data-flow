@@ -1,3 +1,4 @@
+import dateparser
 import regex
 from httpx import Response
 
@@ -35,17 +36,19 @@ class RegisterProductCrawler(BaseCrawler):
             'user-agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36',
         }
 
-    def _prepare_payload(self, data: dict):
-        data = {
-            'entry.21246675': 'in code',
-            'entry.1536952958': 'asdasd',
-            'entry.2116193397': 'test',
-            'entry.430735533': 'asdasd',
-            'entry.283464321_year': '2024',
-            'entry.283464321_month': '6',
-            'entry.283464321_day': '29',
+    def _prepare_payload(self, data: dict) -> dict:
+        created_at = dateparser.parse(data['created_at'])
+        payload = {
+            'entry.21246675': data['name'],
+            'entry.1536952958': data['price'],
+            'entry.2116193397': data['seller'],
+            'entry.430735533': data['infos'],
+            'entry.283464321_year': created_at.year,
+            'entry.283464321_month': created_at.month,
+            'entry.283464321_day': created_at.day,
         }
-        return data
+        self.logger.debug('Payload prepared.', payload=payload)
+        return payload
 
     async def _access_form_page(self) -> Response:
         url = (
@@ -53,17 +56,23 @@ class RegisterProductCrawler(BaseCrawler):
             + '/forms/d/e/1FAIpQLScAY0_xbg2kswQjY9OdB3E4TUaQMGFYbEatiPcVSPY_udmqgg/viewform?usp=sf_link'
         )
         response = await self.client.get(url)
+        self.logger.info('Accessed form page.')
         return response
 
-    async def submit_form(self):
-        action = '/forms/u/0/d/e/1FAIpQLScAY0_xbg2kswQjY9OdB3E4TUaQMGFYbEatiPcVSPY_udmqgg/formResponse'
-        url = self.base_url + action
-        data = self._prepare_payload({})
+    async def submit_form(self, data: dict):
+        self.logger.info('Submitting form...')
+        url = (
+            self.base_url
+            + '/forms/u/0/d/e/1FAIpQLScAY0_xbg2kswQjY9OdB3E4TUaQMGFYbEatiPcVSPY_udmqgg/formResponse'
+        )
+        payload = self._prepare_payload(data)
         response = await self.client.post(
             url,
-            data=data,
+            data=payload,
         )
         if not regex.search(r'registrad', response.text, flags=regex.I):
-            raise Exception()
+            raise Exception("It wasn't possible to register the product!")
 
-        self.logger.info('Product registered with sucessfully!')
+        self.logger.info(
+            'Product registered with sucessfully!', data=dict(product=data)
+        )
