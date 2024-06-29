@@ -7,7 +7,7 @@ from lxml import html
 from process_data_flow.commons.logger import Logger, LoggerFactory
 
 
-class BaseScraper(ABC):
+class BaseCrawler(ABC):
     def __init__(self, logger: Logger = LoggerFactory.new()):
         self._client: httpx.AsyncClient = None
         self.logger = logger

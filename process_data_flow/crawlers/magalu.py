@@ -2,13 +2,13 @@ import httpx
 
 from process_data_flow.commons.decorators import async_cache
 from process_data_flow.commons.requests import MethodRequestEnum, make_async_request
-from process_data_flow.scrapers.base import BaseScraper
+from process_data_flow.crawlers.base import BaseCrawler
 from process_data_flow.settings import (
     REDIS_CACHE_TTL,
 )
 
 
-class MagaluScraper(BaseScraper):
+class MagaluCrawler(BaseCrawler):
     @property
     def base_url(self):
         return 'https://www.magazineluiza.com.br'
