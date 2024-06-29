@@ -19,7 +19,7 @@ REDIS_CONFIG = {
 
 REDIS_CONNECTION_POOL = redis.ConnectionPool(**REDIS_CONFIG)
 
-EXTRACT_API_URL = os.getenv('EXTRACT_API_URL', 'http://localhost:8081')
+MAGALU_API_URL = os.getenv('MAGALU_API_URL', 'http://localhost:8081')
 MARKET_API_URL = os.getenv('MARKET_API_URL', 'http://localhost:8082')
 
 RABBITMQ_HOST = os.getenv('RABBIT_HOST', 'localhost')

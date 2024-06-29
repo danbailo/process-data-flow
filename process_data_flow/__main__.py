@@ -20,10 +20,10 @@ consumer = Typer()
 
 
 @api.command()
-def extractor(
+def magalu(
     port: int = Option(default=8081), reload: bool = Option(default=False, is_flag=True)
 ):
-    uvicorn.run('process_data_flow.apis.extractor.app:app', port=port, reload=reload)
+    uvicorn.run('process_data_flow.apis.magalu.app:app', port=port, reload=reload)
 
 
 @api.command()

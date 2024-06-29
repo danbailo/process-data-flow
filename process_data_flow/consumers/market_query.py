@@ -4,12 +4,12 @@ from pika.channel import Channel
 from pika.spec import Basic, BasicProperties
 
 from process_data_flow.clients.market import MarketAPIClient
+from process_data_flow.clients.magalu import MagaluAPIClient
 from process_data_flow.commons.rabbitmq.consumer import (
     RabbitMQConsumer,
     RabbitMQConsumerOptions,
 )
 from process_data_flow.consumers.exceptions import ItemAlreadyExists
-from process_data_flow.scrapers.magalu import MagaluScraper
 from process_data_flow.services.extract_data import (
     FormatExtractedDataFromUrlService,
 )
@@ -26,6 +26,7 @@ class MarketQueryConsumer(RabbitMQConsumer):
     def __init__(
         self,
         market_api_client: MarketAPIClient = MarketAPIClient(),
+        magalu_api_client: MagaluAPIClient = MagaluAPIClient(),
         options: RabbitMQConsumerOptions = RabbitMQConsumerOptions(),
     ):
         options.queue = self.queue
@@ -33,6 +34,7 @@ class MarketQueryConsumer(RabbitMQConsumer):
         super().__init__(options=options)
 
         self.market_api_client = market_api_client
+        self.magalu_api_client = magalu_api_client
 
     def _execute(
         self,
@@ -42,10 +44,9 @@ class MarketQueryConsumer(RabbitMQConsumer):
         body: bytes,
     ):
         message = body.decode()
-        magalu_scraper = MagaluScraper(self.logger)
         format_extracted_data = FormatExtractedDataFromUrlService()
 
-        data = asyncio.run(magalu_scraper.extract_data_from_product(message))
+        data = asyncio.run(self.magalu_api_client.extract_data_from_product(message))
         formatted_data = format_extracted_data.execute(data)
 
         response = asyncio.run(
@@ -53,7 +54,6 @@ class MarketQueryConsumer(RabbitMQConsumer):
         )
 
         if response.status_code == 200 and response.json()['items']:
-            breakpoint()
             raise ItemAlreadyExists(requeue=False)
 
         formatted_data['url'] = message
