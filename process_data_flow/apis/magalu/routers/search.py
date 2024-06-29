@@ -1,21 +1,20 @@
 from fastapi import APIRouter, Query
 
-from process_data_flow.clients.extractor import ExtractorAPIClient
+from process_data_flow.clients.magalu import MagaluAPIClient
 from process_data_flow.commons.api import BuildListResponse
 from process_data_flow.scrapers.magalu import MagaluScraper
 
-router = APIRouter(prefix='/extract-data', tags=['extract-data'])
-
+router = APIRouter(prefix='/search', tags=['search'])
 
 @router.get('')
-async def extract_data_from_monitored_products(
+async def get_urls_from_monitored_products(
     page: int = Query(1, gt=0),
     limit: int = Query(30, gt=0),
 ):
     magalu_scraper = MagaluScraper()
 
-    extractor_api_client = ExtractorAPIClient()
-    monitored_products = await extractor_api_client.get_monitored_products()
+    magalu_api_client = MagaluAPIClient()
+    monitored_products = await magalu_api_client.get_monitored_products()
     extracted_data = []
     for monitored_product in monitored_products:
         extracted_data.extend(
@@ -34,7 +33,7 @@ async def extract_data_from_monitored_products(
 
 
 @router.get('/{product}')
-async def extract_data_from_product(
+async def get_urls_from_product(
     product: str,
     page: int = Query(1, gt=0),
     limit: int = Query(30, gt=0),

@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlmodel import Session, func, select
 
 from process_data_flow.apis.dependencies import get_session
-from process_data_flow.apis.extractor.models import MonitoredProductModel
+from process_data_flow.apis.magalu.models import MonitoredProductModel
 from process_data_flow.commons.api import BuildListResponse
 from process_data_flow.schemas import MonitoredProductIn, MonitoredProductOut
 
