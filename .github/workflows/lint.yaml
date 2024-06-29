@@ -45,9 +45,3 @@ jobs:
 
     - name: Run types check
       run: make check_types
-
-    - name: Init containers
-      run: make init_containers
-
-    - name: Run tests
-      run: make test

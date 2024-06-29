@@ -1,10 +1,6 @@
-# Process Data Flow - An example of flow that receive/process/register some data.
+# Process Data Flow - An example of flow that receive/transform/register some data.
 
-[![Tests and Linting](https://github.com/danbailo/process-data-flow/actions/workflows/tests.yaml/badge.svg?branch=main)](https://github.com/danbailo/process-data-flow/actions/workflows/tests.yaml) ![Coverage Status](./assets/coverage-badge.svg)
-
-Simple structure that I([@danbailo](https://github.com/danbailo)) like use to build projects.
-
-enjoy and... Python 🐍 for everthing 😄
+[![Linting](https://github.com/danbailo/process-data-flow/actions/workflows/lint.yaml/badge.svg?branch=main)](https://github.com/danbailo/process-data-flow/actions/workflows/lint.yaml) *Repository generated with [danbailo-cookiecutter-template](https://github.com/danbailo/danbailo-cookiecutter-template)*
 
 ## Make
 The project uses a [Makefile](Makefile) to facilitate project installation, lint execution, typing and testing.
@@ -40,8 +36,6 @@ make install_with_pyenv
 `make lint` - Formats the code by automatically correcting the lint.
 
 `make check_types` - Checks the typing hinting of the code.
-
-`make test` - Runs the project's tests.
 
 `make check_all` - Runs all the project's "checkers" and tests signaling when everything is ok. This way, it is certain that the pull-request pipeline will be ready to go to main.
 

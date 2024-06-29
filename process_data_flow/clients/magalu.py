@@ -14,11 +14,11 @@ class MagaluAPIClient(BaseAPIClient):
     ):
         super().__init__(host, logger)
 
-    async def get_extracted_data(self):
-        url = self.host + '/extract-data'
-        extracted_data = await self.paging_requests(url)
-        self.logger.info(f'Was extracted {len(extracted_data)} items')
-        return extracted_data
+    async def get_urls_from_monitored_products(self):
+        url = self.host + '/search'
+        collected_data = await self.paging_requests(url)
+        self.logger.info(f'Was collected {len(collected_data)} items')
+        return collected_data
 
     async def get_product(self):
         url = self.host + '/product'

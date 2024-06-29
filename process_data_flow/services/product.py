@@ -21,7 +21,7 @@ class SendExtractDataToProductQueueService:
     def execute(self):
         send_data_to_rabbitmq = SendDataToRabbitMQService()
 
-        data = asyncio.run(self.magalu_api_client.get_extracted_data())
+        data = asyncio.run(self.magalu_api_client.get_urls_from_monitored_products())
         send_data_to_rabbitmq.execute(
             items=data,
             exchange=PRODUCT_CONSUMER_EXCHANGE,
