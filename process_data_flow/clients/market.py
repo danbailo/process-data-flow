@@ -14,6 +14,11 @@ class MarketAPIClient(BaseAPIClient):
     ):
         super().__init__(host, logger)
 
+    async def get_product_by_id(self, id: str):
+        url = self.host + f'/product/{id}'
+        response = await make_async_request(MethodRequestEnum.GET, url)
+        return response
+
     async def get_product(self, code: str):
         url = self.host + '/product'
         response = await make_async_request(
