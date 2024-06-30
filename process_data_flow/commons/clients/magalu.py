@@ -1,4 +1,4 @@
-from process_data_flow.clients.base import BaseAPIClient
+from process_data_flow.commons.clients.base import BaseAPIClient
 from process_data_flow.commons.logger import Logger, LoggerFactory
 from process_data_flow.commons.requests import MethodRequestEnum, make_async_request
 from process_data_flow.settings import (

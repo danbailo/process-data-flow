@@ -1,6 +1,6 @@
 import asyncio
 
-from process_data_flow.clients.magalu import MagaluAPIClient
+from process_data_flow.commons.clients.magalu import MagaluAPIClient
 from process_data_flow.commons.logger import Logger, LoggerFactory
 from process_data_flow.services.rabbitmq import SendDataToRabbitMQService
 from process_data_flow.settings import (

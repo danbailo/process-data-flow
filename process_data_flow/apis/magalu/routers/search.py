@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Query
 
-from process_data_flow.clients.magalu import MagaluAPIClient
 from process_data_flow.commons.api import BuildListResponse
+from process_data_flow.commons.clients.magalu import MagaluAPIClient
 from process_data_flow.crawlers.magalu import MagaluCrawler
 
 router = APIRouter(prefix='/search', tags=['search'])
